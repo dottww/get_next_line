@@ -6,102 +6,59 @@
 /*   By: weilin <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/23 19:27:10 by weilin            #+#    #+#             */
-/*   Updated: 2018/11/29 19:18:01 by weilin           ###   ########.fr       */
+/*   Updated: 2018/12/06 15:38:36 by weilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int		readlinewidth(int fd)
+int	ft_read(const int fd, char **all, char ***all_table)
 {
-	char	buff[2];
-	size_t	nbread;
 
-	(void) memset((void *) buff, 0, (size_t) 2);
-	nbread = read(fd, (void *) buff,(size_t) 2);
-	if (nbread == -1 || nbread == 0)
-		return (-1);
-	buff[1] = '\0';
-	return(atoi(buff));
-}
-
-void	readandprintlines(int fd, size_t linewidth)
-{
-	char	*buff;
-	size_t	nbread;
-
-	buff = (char *)malloc((linewidth + 1) * sizeof(*buff));
-	if (buff == NULL)
-		return ;
-	(void) memset((void *) buff, 0, linewidth + 1);
-	while ((nbread = read(fd, (void *)buff, linewidth)) != 0)
-	{
-		printf("%s", buff);
-		(void) memset((void *)buff, 0, linewidth);
-	}
-	free(buff);
-	return ;
-}
-
-int			get_next_line(const int fd, char **line)
-{
-	char		buff[BUFF_SIZE];
+	char		buff[BUFF_SIZE + 1];
 	int			total_size;
-	int			nbread;
-	static char	*ptr;
-	static char	*result;
-	static int	count;
+	int			size_count;
+	char		*tmp;
 
 
-	
-	if ((nbread = read(fd, buff, BUFF_SIZE - 1)) < 0)
-		return (-1);
-	else if (nbread == 0)
-		return (0);
-	result = NULL;
-	ptr = result;
-	buff[nbread] = '\0';
-	count = 0;
-	if (!(line[count] = (char*)malloc(sizeof(char) * (total_size + 1))))
+	total_size = 0;
+	while ((size_count = read(fd, buff, BUFF_SIZE)) > 0)
 	{
-		count++;
-		return (1);
-	}
-
-		*result = '\0';
+		total_size = total_size + size_count;
+		tmp = *all;
+		buff[size_count] = '\0';
+		if (!(*all = (char*)malloc(sizeof(char) * (total_size + 1))))
+			return (-1);
+		**all = '\0';
 		if (tmp)
-			ft_strcpy(result, tmp);
-		ft_strcat(result, buff);
+			ft_strcpy(*all, tmp);
+		ft_strcat(*all, buff);
 		if (tmp)
 			free(tmp);
 	}
-	newlist->content_size = content ? content_size : 0;
-	if(ft_putstr(result))
-		return (1)
-	if(!ft_putstr(result))
-	return (result);
+	if (total_size == 0)
+		return (0);
+	if(!(*all_table = ft_strsplit(*all, '\n')))
+		return (-1);
+	return (1);
 }
-char	*ft_strchr(const char *s, int c)
 
-
-int			main(void)
+int	get_next_line(const int fd, char **line)
 {
+	int			nbread;
+	char		*all;
+	char		**all_table;
+	static int	count;
 
-	char	*readpipe;
-	int		match;
-
-	if (!(readpipe = ft_read()))
-		ft_putstr("aucune");
-	else
-	{
-		i = -1;
-		match = 0;
-		while (i++ < 4)
-		{
-			ft_print(i, w, h);
-			match++;
-		}
-	}
-	ft_putchar('\n');
-	return (0);
+	if (!fd || *line == NULL || read(fd, NULL, 0) < 0)
+		return (-1);
+	count = 0;
+	all = NULL;
+	all_table = NULL;
+	nbread = ft_read(fd, &all, &all_table);
+	*line = all_table[count];
+	count++;
+	free(all);
+	ft_memdel((void*)all_table);
+	return (nbread);
 }
