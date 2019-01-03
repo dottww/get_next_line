@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: weilin <marvin@42.fr>                      +#+  +:+       +#+        */
+/*   By: Wei <Wei@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/23 19:27:10 by weilin            #+#    #+#             */
-/*   Updated: 2018/12/07 19:24:53 by weilin           ###   ########.fr       */
+/*   Updated: 2019/01/03 12:21:52 by Wei              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,53 +14,40 @@
 #include <stdio.h>
 
 #define MAX_FD 1024
-/*
-static int	ft_read(const int fd, char **line, char **rest)
-{
-	char			buff[BUFF_SIZE + 1];
-	int				total_size;
-	int				rd;
-	char			*tmp;
 
-	//tmp = *rest;
+int	get_next_line(const int fd, char **line)
+{
+	static char		*rest;
+	int				rd;
+	char			buff[BUFF_SIZE + 1];
+	//char			*tmp;
+	
+	if (!fd || !line || read(fd, NULL, 0) < 0)
+		return (-1);
 	while ((rd = read(fd, buff, BUFF_SIZE)) > 0)
 	{
-		if (ft_strchr(buff, '\n') == NULL)
-		{
-			if (*rest)
-				*rest = ft_strjoin(*rest, buff);
-			else
-				*rest = ft_strdup(buff);
-		}
+		//&& ft_strchr(buff, '\n') == NULL
+		buff[BUFF_SIZE] = '\0';
+		if (rest)
+			rest = ft_strjoin(rest, buff);
 		else
+			rest = ft_strdup(buff);
+		if (ft_strchr(rest, '\n') != NULL)
 		{
-			if (*rest)
-				*line = ft_strjoin(*rest, ft_strsub(buff, 0, ft_strchr(buff, '\n') - buff + 1));
-			else
-				ft_memccpy(*line, buff, '\n', BUFF_SIZE + 1);
-				*rest = ft_strdup(ft_strstr(buff, "\n"));
-				//save = ft_strsub(buff, ft_strchr(buff, '\n') - buff + 1, ft_strlen(buff));
-			return (1);
+			*line = ft_strsub(rest, !0, ft_strchr(rest, '\n') - rest);
+			rest = ft_strstr(rest, "\n");
 			break ;
 		}
-		//if (tmp)
-	//		free(tmp);
+		//save = ft_strsub(buff, ft_strchr(buff, '\n') - buff + 1, ft_strlen(buff));
+		//if (tmp != NULL)
+		//	free(tmp);
 	}
 	if (rd == 0)
 		return (0);
 	return (1);
 }
-*/
+
 /*
-int	get_next_line(const int fd, char **line)
-{
-	char			*tmp;
-	static char		*rest;
-	char			buff[BUFF_SIZE + 1];
-	int				rd;
-	
-	if (!fd || !line || read(fd, NULL, 0) < 0)
-		return (-1);
 	while ((rd = read(fd, buff, BUFF_SIZE)) > 0)
 	{
 		if (ft_strchr(buff, '\n') == NULL)
@@ -90,6 +77,7 @@ int	get_next_line(const int fd, char **line)
 	return (1);
 }
 */
+
 int		ft_new_line(char **s, char **line, int fd, int ret)
 {
 	char	*tmp;
@@ -117,7 +105,7 @@ int		ft_new_line(char **s, char **line, int fd, int ret)
 	return (1);
 }
 
-int		get_next_line(const int fd, char **line)
+int		get_next_line1(const int fd, char **line)
 {
 	static char	*s[255];
 	char		buf[BUFF_SIZE + 1];
