@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   get_next_line.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: Wei <Wei@student.42.fr>                    +#+  +:+       +#+        */
+/*   By: weilin <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/23 19:27:10 by weilin            #+#    #+#             */
-/*   Updated: 2019/01/03 12:21:52 by Wei              ###   ########.fr       */
+/*   Updated: 2019/01/05 12:51:54 by weilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,144 +15,67 @@
 
 #define MAX_FD 1024
 
-int	get_next_line(const int fd, char **line)
+int get_next_line(const int fd, char **line, int nol)
 {
-	static char		*rest;
-	int				rd;
-	char			buff[BUFF_SIZE + 1];
-	//char			*tmp;
-	
+	static char *rest = NULL;
+	int rd;
+	char buff[BUFF_SIZE + 1];
+	char *tmp;
+	char *n;
+
 	if (!fd || !line || read(fd, NULL, 0) < 0)
 		return (-1);
 	while ((rd = read(fd, buff, BUFF_SIZE)) > 0)
 	{
-		//&& ft_strchr(buff, '\n') == NULL
 		buff[BUFF_SIZE] = '\0';
 		if (rest)
 			rest = ft_strjoin(rest, buff);
 		else
 			rest = ft_strdup(buff);
-		if (ft_strchr(rest, '\n') != NULL)
-		{
-			*line = ft_strsub(rest, !0, ft_strchr(rest, '\n') - rest);
-			rest = ft_strstr(rest, "\n");
-			break ;
-		}
-		//save = ft_strsub(buff, ft_strchr(buff, '\n') - buff + 1, ft_strlen(buff));
-		//if (tmp != NULL)
-		//	free(tmp);
+		if (ft_strchr(buff, '\n'))
+			break;
 	}
-	if (rd == 0)
-		return (0);
-	return (1);
-}
-
-/*
-	while ((rd = read(fd, buff, BUFF_SIZE)) > 0)
+	if (rest != '\0' && (n = ft_strchr(rest, '\n')))
 	{
-		if (ft_strchr(buff, '\n') == NULL)
-		{
-			if (rest)
-			{	
-				tmp = rest;
-				rest = ft_strjoin(rest, buff);
-				free(tmp);
-			}
-			else
-				rest = ft_strdup(buff);
-		}
-		else
-		{
-			if (rest)
-				*line = ft_strjoin(rest, ft_strsub(buff, 0, ft_strchr(buff, '\n') - buff));
-			else
-				ft_memccpy(*line, buff, '\n', ft_strchr(buff, '\n') - buff);
-				rest = ft_strdup(ft_strstr(buff, "\n") + 1);
-			return (1);
-			break ;
-		}
+		*line = ft_strsub(rest, 0, n - rest);
+		rest = ft_strsub(rest, n - rest + 1, ft_strlen(rest) - (n - rest) - 1);
+		return (1);
 	}
-	if (rd == 0)
-		return (0);
-	return (1);
-}
-*/
-
-int		ft_new_line(char **s, char **line, int fd, int ret)
-{
-	char	*tmp;
-	int		len;
-
-	len = 0;
-	while (s[fd][len] != '\n' && s[fd][len] != '\0')
-		len++;
-	if (s[fd][len] == '\n')
+	else if (rest != '\0')
 	{
-		*line = ft_strsub(s[fd], 0, len);
-		tmp = ft_strdup(s[fd] + len + 1);
-		free(s[fd]);
-		s[fd] = tmp;
-		if (s[fd][0] == '\0')
-			ft_strdel(&s[fd]);
+		*line = ft_strdup(rest);
+		rest = NULL;
+		return (1);
 	}
-	else if (s[fd][len] == '\0')
-	{
-		if (ret == BUFF_SIZE)
-			return (get_next_line(fd, line));
-		*line = ft_strdup(s[fd]);
-		ft_strdel(&s[fd]);
-	}
-	return (1);
-}
-
-int		get_next_line1(const int fd, char **line)
-{
-	static char	*s[255];
-	char		buf[BUFF_SIZE + 1];
-	char		*tmp;
-	int			ret;
-
-	if (fd < 0 || line == NULL)
-		return (-1);
-	while ((ret = read(fd, buf, BUFF_SIZE)) > 0)
-	{
-		buf[ret] = '\0';
-		if (s[fd] == NULL)
-			s[fd] = ft_strnew(1);
-		tmp = ft_strjoin(s[fd], buf);
-		free(s[fd]);
-		s[fd] = tmp;
-		if (ft_strchr(buf, '\n'))
-			break ;
-	}
-	if (ret < 0)
-		return (-1);
-	else if (ret == 0 && (s[fd] == NULL || s[fd][0] == '\0'))
-		return (0);
-	return (ft_new_line(s, line, fd, ret));
+	//	if (rd == 0 && rest == NULL)
+	return (0);
 }
 
 int main(int argc, char **argv)
 {
 	int fd;
-	int ret;	
-	int nol;	
-	char *line;	
+	int ret;
+	int nol;
+	char *line;
 
 	(void)argc;
 	nol = 0;
-		//int fd2;
-		//int ret2;
-		//int nol2;
-		//char *line2;
-		//nol2= 0;
+	//int fd2;
+	//int ret2;
+	//int nol2;
+	//char *line2;
+	//nol2= 0;
 	fd = open(argv[1], O_RDONLY);
-	while ((ret = get_next_line(fd, &line)) > 0)
+	while ((ret = get_next_line(fd, &line, nol)) > 0)
 	{
-		printf("[Return: %d] Line #%d: %s\n", ret, ++nol, line);
+		printf("[Return: %d] Line #%.2d: %s\n", ret, ++nol, line);
 		free(line);
 	}
-	printf("[Return: %d] Line #%d: %s\n", ret, ++nol, line);
+	printf("[Return: %d] Line #%.2d: %s = Last Line\n", ret, nol, line);
+	get_next_line(fd, &line, nol);
+	printf("[Return: %d] Line #%.2d: %s = Last Line\n", ret, nol, line);
+	get_next_line(fd, &line, nol);
+	printf("[Return: %d] Line #%.2d: %s = Last Line\n", ret, nol, line);
 	if (ret == -1)
 		printf("-----------Error\n");
 	else if (ret == 0)
