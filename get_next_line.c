@@ -6,7 +6,7 @@
 /*   By: weilin <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/23 19:27:10 by weilin            #+#    #+#             */
-/*   Updated: 2019/01/07 15:38:47 by weilin           ###   ########.fr       */
+/*   Updated: 2019/01/07 16:28:33 by weilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,48 +63,3 @@ int			get_next_line(const int fd, char **line)
 	ft_strdel(&buff);
 	return (ft_return_line(s, line, fd, rd));
 }
-
-#include <stdio.h>
-
-int main(int argc, char **argv)
-{
-	int fd;
-	int ret;
-	int nol;
-	char *line;
-
-	(void)argc;
-	nol = 0;
-	//int fd2;
-	//int ret2;
-	//int nol2;
-	//char *line2;
-	//nol2= 0;
-	fd = open(argv[1], O_RDONLY);
-	while ((ret = get_next_line(fd, &line)) > 0)
-	{
-		printf("[Return: %d] Line #%.2d: %s\n", ret, ++nol, line);
-		ft_strdel(&line);
-	}
-	printf("[Return: %d] Line #%.2d: %s = Last Line\n", ret, nol, line);
-	get_next_line(fd, &line);
-	printf("[Return: %d] Line #%.2d: %s = Last Line\n", ret, nol, line);
-	if (ret == -1)
-		printf("-----------Error\n");
-	else if (ret == 0)
-		printf("-----------End of file\n");
-	close(fd);
-	/*fd2 = open(argv[2], O_RDONLY);
-	while ((ret2 = get_next_line(fd2, &line2)) > 0)
-	{
-		printf("[Return: %d] Line #%d: %s\n", ret2, ++nol2, line2);
-		free(line2);
-	}
-	if (ret2 == -1)
-		printf("-----------Error\n");
-	else if (ret2 == 0)
-		printf("-----------End of file\n");
-	close(fd2);*/
-	return (0);
-}
-
