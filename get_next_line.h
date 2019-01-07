@@ -6,16 +6,16 @@
 /*   By: weilin <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/23 19:29:30 by weilin            #+#    #+#             */
-/*   Updated: 2019/01/05 17:10:46 by weilin           ###   ########.fr       */
+/*   Updated: 2019/01/07 15:27:47 by weilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef GET_NEXT_LINE_H
-#define GET_NEXT_LINE_H
-#define BUFF_SIZE 2
+# define GET_NEXT_LINE_H
+# define BUFF_SIZE 2
 
-#include "libft/libft.h"
-#include <fcntl.h>
+# include "libft/libft.h"
+# include <fcntl.h>
 
 int get_next_line(const int fd, char **line);
 

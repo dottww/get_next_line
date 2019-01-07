@@ -6,52 +6,62 @@
 /*   By: weilin <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/11/23 19:27:10 by weilin            #+#    #+#             */
-/*   Updated: 2019/01/05 19:22:40 by weilin           ###   ########.fr       */
+/*   Updated: 2019/01/07 15:38:47 by weilin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int get_next_line(const int fd, char **line)
+static int	ft_return_line(char **s, char **line, const int fd, int rd)
 {
-	static char *rest = NULL;
-	int rd;
-	char *buff;
-	char *n;
+	char		*n;
+	int			len;
+	int			slen;
 
-	if (fd < 0 || !line || read(fd, NULL, 0) < 0 || BUFF_SIZE < 1 || 
+	if (s[fd] != '\0' && (n = ft_strchr(s[fd], '\n')))
+	{
+		len = n - s[fd];
+		slen = ft_strlen(s[fd]);
+		*line = ft_strsub(s[fd], 0, len);
+		s[fd] = ft_strreset(s[fd], ft_strsub(s[fd], len + 1, slen - len - 1));
+		return (1);
+	}
+	else if (s[fd] != '\0')
+	{
+		*line = ft_strdup(s[fd]);
+		ft_strdel(&s[fd]);
+		if (ft_strlen(*line) == 0 && rd == 0)
+		{
+			*line = ft_strreset(*line, "\0");
+			return (0);
+		}
+		return (1);
+	}
+	ft_strdel(&s[fd]);
+	return (0);
+}
+
+int			get_next_line(const int fd, char **line)
+{
+	static char	*s[256];
+	int			rd;
+	char		*buff;
+
+	if (fd < 0 || !line || read(fd, NULL, 0) < 0 || BUFF_SIZE < 1 ||
 		!(buff = ft_strnew(BUFF_SIZE)))
 		return (-1);
 	while ((rd = read(fd, buff, BUFF_SIZE)) > 0)
 	{
-		if (rest)
-			rest = ft_cleanswap(rest, ft_strjoin(rest, buff));
+		if (s[fd])
+			s[fd] = ft_strreset(s[fd], ft_strjoin(s[fd], buff));
 		else
-			rest = ft_strdup(buff);
+			s[fd] = ft_strdup(buff);
 		if (ft_strchr(buff, '\n'))
-			break;
+			break ;
 		ft_strclr(buff);
 	}
 	ft_strdel(&buff);
-	if (rest != '\0' && (n = ft_strchr(rest, '\n')))
-	{
-		int cpylen = n - rest;
-		int restlen = ft_strlen(rest);
-		*line = ft_strsub(rest, 0, cpylen);
-		rest = ft_cleanswap(rest,
-				ft_strsub(rest, cpylen + 1, restlen - cpylen - 1));
-		return (1);
-	}
-	else if (rest != '\0')
-	{
-		*line = ft_strdup(rest);
-		ft_strdel(&rest);
-		if(ft_strlen(*line) == 0 && rd == 0)
-			return(0);
-		return (1);
-	}
-	ft_strdel(&rest);
-	return (0);
+	return (ft_return_line(s, line, fd, rd));
 }
 
 #include <stdio.h>
